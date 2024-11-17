@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./signup.css";
+import "./Signup.css";
 import { ToastContainer, toast } from "react-toastify";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../../lib/firebase";
