@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./login.css";
 import { ToastContainer, toast } from "react-toastify";
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithRedirect } from "firebase/auth";
 import { auth } from "../../lib/firebase";
 import { Link } from "react-router-dom";
 
@@ -29,7 +29,7 @@ const Login = () => {
   const handleGoogleSignIn = async () => {
     setLoading(true);
     try {
-      await signInWithPopup(auth, googleProvider);
+      await signInWithRedirect(auth, googleProvider);
       toast.success("Logged in with Google!");
     } catch (err) {
       console.log(err);
