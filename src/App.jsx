@@ -26,7 +26,6 @@ const App = () => {
   }, [fetchUserInfo]);
 
   if (isLoading) return <div className="loading">Loading...</div>;
-
   return (
     <Router>
       <div className="container">
