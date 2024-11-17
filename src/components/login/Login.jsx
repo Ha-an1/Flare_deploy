@@ -1,9 +1,10 @@
 import { useState } from "react";
 import "./login.css";
 import { ToastContainer, toast } from "react-toastify";
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithRedirect } from "firebase/auth";
-import { auth } from "../../lib/firebase";
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth, db } from "../../lib/firebase";
 import { Link } from "react-router-dom";
+import { doc, setDoc } from "firebase/firestore";
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
@@ -27,15 +28,27 @@ const Login = () => {
   };
 
   const handleGoogleSignIn = async () => {
-    setLoading(true);
     try {
-      await signInWithRedirect(auth, googleProvider);
-      toast.success("Logged in with Google!");
-    } catch (err) {
-      console.log(err);
-      toast.error(err.message);
-    } finally {
-      setLoading(false);
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      console.log("User  Info: ", user);
+      await setDoc(doc(db,"users",user.uid),
+      {
+        username:user.displayName,
+        email:user.email,
+        avatar:"./avatar.png",
+        id:user.uid,
+        blocked:[],
+      }
+    );
+    await setDoc(doc(db,"userchats",user.uid),{
+      chats:[],
+    });
+
+      // You can handle user info or redirect after successful login
+    } catch (error) {
+      console.error("Error during Google sign-in: ", error);
+      toast.error(error.message);
     }
   };
 
@@ -44,13 +57,11 @@ const Login = () => {
       <div className="item">
         <h2>Welcome back</h2>
         <form onSubmit={handleLogin}>
-          <input type="text" placeholder="Email" name="email" />
-          <input type="password" placeholder="Password" name="password" />
+          <input type="text" placeholder="Email" name="email" required />
+          <input type="password" placeholder="Password" name="password" required />
           <button disabled={loading}>{loading ? "Loading" : "Sign In"}</button>
         </form>
-        <button onClick={handleGoogleSignIn} disabled={loading}>
-          {loading ? "Loading" : "Sign In with Google"}
-        </button>
+        <button onClick={handleGoogleSignIn}>Sign in with Google</button>
         <p>Don’t have an account yet?&nbsp;<Link to="/signup" className="custom-link">Signup</Link></p>
       </div>
       <ToastContainer />
